@@ -1,0 +1,32 @@
+services:
+  # FastAPI Backend Service
+  - type: web
+    name: jigar-portfolio-api
+    runtime: python
+    plan: free
+    region: oregon
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: python -m uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: APP_NAME
+        value: Jigar Rohit Portfolio API
+      - key: APP_VERSION
+        value: 1.0.0
+      - key: ADDITIONAL_CORS_ORIGINS
+        sync: false
+
+  # React 3D Frontend Static Site
+  - type: web
+    name: jigar-portfolio-frontend
+    runtime: static
+    plan: free
+    region: oregon
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

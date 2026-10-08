@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+backend/__pycache__/
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+ENV/
+
+# Build artifacts
+frontend/dist/
+dist/
+.tmp/
+*.tsbuildinfo
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environment and secrets (Never commit!)
+.env
+*.env.local
+*.env.*.local
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
