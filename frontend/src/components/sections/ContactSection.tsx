@@ -132,6 +132,23 @@ export default function ContactSection({
               </p>
 
               <div className="space-y-3">
+                {/* Direct Email Link */}
+                <a
+                  href="mailto:rohitjigarmaheshbhai@gmail.com"
+                  className="p-3 rounded-xl bg-slate-950/60 border border-cyan-500/20 hover:border-cyan-400/50 flex items-center justify-between text-gray-200 hover:text-white transition-all group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-cyan-500/10 text-cyan-400">
+                      <Mail className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <span className="text-xs font-bold block">Direct Email</span>
+                      <span className="text-[11px] text-gray-400 font-mono">rohitjigarmaheshbhai@gmail.com</span>
+                    </div>
+                  </div>
+                  <ExternalLink className="w-3.5 h-3.5 text-gray-500 group-hover:text-cyan-400" />
+                </a>
+
                 {/* LinkedIn Link */}
                 <a
                   href="https://www.linkedin.com/in/jigar-rohit-874aa0374/"
