@@ -80,12 +80,21 @@ export default function Footer({
             LinkedIn
             <ExternalLink className="w-3 h-3" />
           </a>
-          <button
-            onClick={onOpenGithubModal}
+          <a
+            href="https://github.com/Rohit-Jigar/3d-portfolio"
+            target="_blank"
+            rel="noopener noreferrer"
             className="text-xs text-gray-400 hover:text-cyan-300 transition-colors flex items-center gap-1"
           >
             GitHub
             <ExternalLink className="w-3 h-3" />
+          </a>
+          <button
+            onClick={onOpenGithubModal}
+            className="text-[11px] font-mono text-gray-500 hover:text-cyan-300 transition-colors cursor-pointer"
+            title="Inspect Monorepo Architecture"
+          >
+            [Tree]
           </button>
           <a
             href="#contact"
