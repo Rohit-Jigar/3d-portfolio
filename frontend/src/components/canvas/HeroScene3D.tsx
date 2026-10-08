@@ -1,6 +1,6 @@
 import React, { useRef, useMemo, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Float, Sphere, Torus, Html } from '@react-three/drei';
+import { Float, Sphere, Torus } from '@react-three/drei';
 import * as THREE from 'three';
 
 // Interface for floating node data
@@ -84,7 +84,7 @@ function CentralCore({ hoveredNode }: { hoveredNode: string | null }) {
         <meshBasicMaterial color="#a855f7" transparent opacity={0.35} />
       </Torus>
 
-      {/* Point light localized at core center */}
+      {/* Point lights localized at core center */}
       <pointLight color="#00f2fe" intensity={3} distance={6} />
       <pointLight color="#a855f7" intensity={2} distance={5} />
     </group>
@@ -126,66 +126,38 @@ function OrbitingNode({
       onPointerOut={() => onLeave()}
     >
       <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
-        <Sphere args={[0.18, 16, 16]}>
+        <Sphere args={[0.22, 16, 16]}>
           <meshStandardMaterial
             color={node.color}
             emissive={node.color}
-            emissiveIntensity={isHovered ? 2.2 : 1.2}
+            emissiveIntensity={isHovered ? 2.5 : 1.3}
             roughness={0.1}
           />
         </Sphere>
-        <Torus args={[0.26, 0.015, 8, 32]}>
-          <meshBasicMaterial color={node.color} transparent opacity={0.6} />
+        <Torus args={[0.32, 0.018, 8, 32]}>
+          <meshBasicMaterial color={node.color} transparent opacity={isHovered ? 0.9 : 0.5} />
         </Torus>
-
-        {/* 3D Label overlay */}
-        <Html distanceFactor={10} position={[0, 0.35, 0]} center>
-          <div
-            className={`pointer-events-none transition-all duration-300 transform ${
-              isHovered ? 'scale-110 opacity-100' : 'opacity-80 scale-90'
-            }`}
-          >
-            <div className="px-2.5 py-1 rounded-md text-xs font-mono font-medium backdrop-blur-md bg-slate-900/80 border border-cyan-500/30 text-cyan-200 shadow-lg whitespace-nowrap">
-              <span className="inline-block w-1.5 h-1.5 rounded-full mr-1.5 bg-cyan-400 animate-pulse"></span>
-              {node.label}
-              <span className="block text-[10px] text-gray-400 font-sans">{node.category}</span>
-            </div>
-          </div>
-        </Html>
       </Float>
     </group>
   );
 }
 
-// Particle field
-function Particles({ count = 280 }: { count?: number }) {
+// Particle field with robust uniform color
+function Particles({ count = 220 }: { count?: number }) {
   const pointsRef = useRef<THREE.Points>(null);
 
-  const [positions, colors] = useMemo(() => {
+  const positions = useMemo(() => {
     const pos = new Float32Array(count * 3);
-    const col = new Float32Array(count * 3);
-    const palette = [
-      new THREE.Color('#00f2fe'),
-      new THREE.Color('#a855f7'),
-      new THREE.Color('#38bdf8'),
-      new THREE.Color('#94a3b8'),
-    ];
-
     for (let i = 0; i < count; i++) {
-      const radius = 3.5 + Math.random() * 5.5;
+      const radius = 3.5 + Math.random() * 5.0;
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(Math.random() * 2 - 1);
 
       pos[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
       pos[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
       pos[i * 3 + 2] = radius * Math.cos(phi);
-
-      const color = palette[Math.floor(Math.random() * palette.length)];
-      col[i * 3] = color.r;
-      col[i * 3 + 1] = color.g;
-      col[i * 3 + 2] = color.b;
     }
-    return [pos, col];
+    return pos;
   }, [count]);
 
   useFrame((_, delta) => {
@@ -202,14 +174,10 @@ function Particles({ count = 280 }: { count?: number }) {
           attach="attributes-position"
           args={[positions, 3]}
         />
-        <bufferAttribute
-          attach="attributes-color"
-          args={[colors, 3]}
-        />
       </bufferGeometry>
       <pointsMaterial
-        size={0.045}
-        vertexColors
+        size={0.04}
+        color="#38bdf8"
         transparent
         opacity={0.65}
         sizeAttenuation
@@ -315,7 +283,7 @@ export default function HeroScene3D({
         <Canvas
           camera={{ position: [0, 0, 6.2], fov: 45 }}
           gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
-          dpr={[1, 1.5]} // Performance optimization: cap at 1.5 for retina
+          dpr={[1, 1.5]}
         >
           <ambientLight intensity={0.6} />
           <directionalLight position={[10, 10, 5]} intensity={1.2} color="#ffffff" />
@@ -333,7 +301,7 @@ export default function HeroScene3D({
             />
           ))}
 
-          <Particles count={240} />
+          <Particles count={220} />
           <MouseParallax />
         </Canvas>
       </WebGLErrorBoundary>
