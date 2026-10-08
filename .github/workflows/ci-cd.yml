@@ -1,0 +1,111 @@
+name: CI/CD Pipeline — 3D Portfolio
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'pages'
+  cancel-in-progress: false
+
+jobs:
+  # -------------------------------------------------------------------------
+  # Job 1: Backend Automated Tests (FastAPI + Pytest)
+  # -------------------------------------------------------------------------
+  backend-tests:
+    name: Backend Test Suite
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Backend Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      - name: Run Pytest Suite
+        run: |
+          python -m pytest backend/tests/test_api.py -v
+
+  # -------------------------------------------------------------------------
+  # Job 2: Frontend Lint & Production Build (React 19 + Vite + Three.js)
+  # -------------------------------------------------------------------------
+  frontend-build:
+    name: Frontend Production Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Frontend Dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build Production Assets
+        working-directory: frontend
+        run: npm run build
+
+      - name: Upload Pages Artifact
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: frontend/dist
+
+  # -------------------------------------------------------------------------
+  # Job 3: Automated Deployment to GitHub Pages
+  # -------------------------------------------------------------------------
+  deploy-github-pages:
+    name: Deploy to GitHub Pages
+    needs: [backend-tests, frontend-build]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  # -------------------------------------------------------------------------
+  # Job 4: Render Backend Auto-Deploy Hook (Optional if secret configured)
+  # -------------------------------------------------------------------------
+  deploy-render:
+    name: Trigger Render Backend Deploy
+    needs: [backend-tests]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Render Webhook
+        env:
+          RENDER_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -n "$RENDER_HOOK" ]; then
+            echo "Triggering Render deployment webhook..."
+            curl -s -X POST "$RENDER_HOOK"
+            echo "Render deploy triggered successfully."
+          else
+            echo "RENDER_DEPLOY_HOOK_URL not configured. Render will deploy automatically via Git branch tracking."
+          fi
