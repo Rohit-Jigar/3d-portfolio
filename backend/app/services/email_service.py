@@ -302,6 +302,65 @@ def send_via_web3forms(
         return False
 
 
+def send_via_formsubmit(
+    name: str,
+    email: str,
+    subject: str,
+    message: str,
+    ticket_id: str
+) -> bool:
+    """
+    Dispatches email via FormSubmit.co AJAX endpoint.
+    Automated zero-configuration delivery to settings.NOTIFICATION_EMAIL.
+    """
+    if not settings.NOTIFICATION_EMAIL:
+        logger.error("FormSubmit dispatch failed: settings.NOTIFICATION_EMAIL is not configured.")
+        return False
+
+    url = f"https://formsubmit.co/ajax/{settings.NOTIFICATION_EMAIL}"
+    headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Referer": "https://rohit-jigar.github.io/3d-portfolio/",
+        "Origin": "https://rohit-jigar.github.io/3d-portfolio/",
+    }
+    payload = {
+        "name": name,
+        "email": email,
+        "_subject": f"[Portfolio Inquiry] {subject} (Ticket: {ticket_id})",
+        "subject": f"[Portfolio Inquiry] {subject} (Ticket: {ticket_id})",
+        "message": f"Ticket: {ticket_id}\n\n{message}",
+        "ticket_id": ticket_id,
+        "_template": "table",
+        "_captcha": "false"
+    }
+
+    logger.info("Attempting FormSubmit dispatch for ticket %s to %s...", ticket_id, settings.NOTIFICATION_EMAIL)
+    try:
+        resp = httpx.post(
+            url,
+            headers=headers,
+            json=payload,
+            timeout=10.0
+        )
+        if resp.status_code in (200, 201):
+            try:
+                data = resp.json()
+                if str(data.get("success", "")).lower() == "false":
+                    logger.error("FormSubmit rejected dispatch for ticket %s: %s", ticket_id, data.get("message"))
+                    return False
+            except Exception:
+                pass
+            logger.info("FormSubmit email delivered successfully for ticket %s", ticket_id)
+            return True
+        else:
+            logger.error("FormSubmit HTTP error for ticket %s: %d %s", ticket_id, resp.status_code, resp.text)
+            return False
+    except Exception as e:
+        logger.error("FormSubmit dispatch exception for ticket %s: %s", ticket_id, str(e))
+        return False
+
+
 def send_inquiry_notification(
     name: str,
     email: str,
@@ -313,7 +372,7 @@ def send_inquiry_notification(
 ) -> bool:
     """
     Main notification router.
-    Evaluates available transport methods (SMTP -> Resend -> Web3Forms)
+    Evaluates available transport methods (SMTP -> Resend -> Web3Forms -> FormSubmit)
     and delivers the inquiry directly to Jigar's email (rohitjigarmaheshbhai@gmail.com).
     """
     text_content, html_content = build_email_content(
@@ -341,11 +400,15 @@ def send_inquiry_notification(
         if send_via_web3forms(name, email, subject, message, ticket_id):
             return True
 
-    # 4. If credentials not yet populated in production env, log structured notification
+    # 4. Try FormSubmit.co zero-configuration automated transport
+    if send_via_formsubmit(name, email, subject, message, ticket_id):
+        return True
+
+    # 5. If credentials not yet populated in production env or all transports failed, log structured notification
     logger.warning(
         "EMAIL NOTIFICATION QUEUED [Simulation/Unconfigured]: "
         "Ticket: %s | From: %s <%s> | Subject: %s | Target: %s. "
-        "To forward to real Gmail inbox, set SMTP_USER and SMTP_PASSWORD (or RESEND_API_KEY / WEB3FORMS_ACCESS_KEY) in Render Environment Variables.",
+        "All delivery transports (SMTP, Resend, Web3Forms, FormSubmit) failed or were unconfigured.",
         ticket_id,
         name,
         email,

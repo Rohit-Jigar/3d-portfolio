@@ -126,3 +126,68 @@ def test_email_service_content_builder():
     assert "MSG-TEST1234" in html_content
     assert "Technical Opportunity" in html_content
     assert "<!DOCTYPE html>" in html_content
+
+
+def test_send_via_formsubmit_success():
+    from unittest.mock import patch, MagicMock
+    from backend.app.services.email_service import send_via_formsubmit
+    from backend.app.config import settings
+
+    mock_resp = MagicMock()
+    mock_resp.status_code = 200
+    mock_resp.json.return_value = {"success": "true", "message": "The form was submitted successfully."}
+
+    with patch("httpx.post", return_value=mock_resp) as mock_post:
+        result = send_via_formsubmit(
+            name="Alice Candidate",
+            email="alice@example.com",
+            subject="Interview Request",
+            message="Let's schedule a call.",
+            ticket_id="MSG-FS001"
+        )
+        assert result is True
+        mock_post.assert_called_once()
+        args, kwargs = mock_post.call_args
+        assert args[0] == f"https://formsubmit.co/ajax/{settings.NOTIFICATION_EMAIL}"
+        headers = kwargs["headers"]
+        assert headers["Referer"] == "https://rohit-jigar.github.io/3d-portfolio/"
+        assert headers["Origin"] == "https://rohit-jigar.github.io/3d-portfolio/"
+        assert headers["Content-Type"] == "application/json"
+        assert kwargs["json"]["ticket_id"] == "MSG-FS001"
+        assert kwargs["json"]["email"] == "alice@example.com"
+
+
+def test_send_via_formsubmit_failure():
+    from unittest.mock import patch, MagicMock
+    from backend.app.services.email_service import send_via_formsubmit
+
+    mock_resp = MagicMock()
+    mock_resp.status_code = 500
+    mock_resp.text = "Internal Server Error"
+
+    with patch("httpx.post", return_value=mock_resp):
+        result = send_via_formsubmit(
+            name="Alice Candidate",
+            email="alice@example.com",
+            subject="Interview Request",
+            message="Let's schedule a call.",
+            ticket_id="MSG-FS002"
+        )
+        assert result is False
+
+
+def test_send_inquiry_notification_falls_back_to_formsubmit():
+    from unittest.mock import patch
+    from backend.app.services.email_service import send_inquiry_notification
+
+    with patch("backend.app.services.email_service.send_via_formsubmit", return_value=True) as mock_fs:
+        result = send_inquiry_notification(
+            name="Bob Recruiter",
+            email="bob@example.com",
+            subject="Senior Role",
+            message="We have an opening for you.",
+            ticket_id="MSG-FS003",
+            timestamp="2026-10-09T12:00:00Z"
+        )
+        assert result is True
+        mock_fs.assert_called_once()
