@@ -17,6 +17,20 @@ services:
         value: 1.0.0
       - key: ADDITIONAL_CORS_ORIGINS
         sync: false
+      - key: NOTIFICATION_EMAIL
+        value: rohitjigarmaheshbhai@gmail.com
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: WEB3FORMS_ACCESS_KEY
+        sync: false
 
   # React 3D Frontend Static Site
   - type: web

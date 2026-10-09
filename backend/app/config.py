@@ -19,6 +19,16 @@ class Settings(BaseSettings):
     ADDITIONAL_CORS_ORIGINS: str = ""
     RATE_LIMIT_CONTACT: str = "5/minute"
 
+    # Notification & Email Configuration
+    NOTIFICATION_EMAIL: str = "rohitjigarmaheshbhai@gmail.com"
+    SMTP_HOST: str = "smtp.gmail.com"
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_USE_TLS: bool = True
+    RESEND_API_KEY: str = ""
+    WEB3FORMS_ACCESS_KEY: str = ""
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

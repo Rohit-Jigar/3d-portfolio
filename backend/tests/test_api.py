@@ -108,3 +108,21 @@ def test_router_simulation():
     data = response.json()
     assert "Groq" in data["selected_provider"] or "Anthropic" in data["selected_provider"]
     assert len(data["fallback_chain"]) > 0
+
+
+def test_email_service_content_builder():
+    from backend.app.services.email_service import build_email_content
+    text_content, html_content = build_email_content(
+        name="John Doe",
+        email="john@example.com",
+        subject="Technical Opportunity",
+        message="We want to invite you to an interview.",
+        ticket_id="MSG-TEST1234",
+        timestamp="2026-10-09T10:00:00Z",
+        client_ip="127.0.0.1"
+    )
+    assert "MSG-TEST1234" in text_content
+    assert "john@example.com" in text_content
+    assert "MSG-TEST1234" in html_content
+    assert "Technical Opportunity" in html_content
+    assert "<!DOCTYPE html>" in html_content
