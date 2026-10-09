@@ -40,7 +40,7 @@ jobs:
 
       - name: Run Pytest Suite
         run: |
-          python -m pytest backend/tests/test_api.py -v
+          python -m pytest backend/tests -v
 
   # -------------------------------------------------------------------------
   # Job 2: Frontend Lint & Production Build (React 19 + Vite + Three.js)
