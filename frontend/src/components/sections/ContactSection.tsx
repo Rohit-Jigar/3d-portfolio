@@ -9,6 +9,7 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import type { ContactFormData } from '../../types';
+import { API_ENDPOINTS } from '../../services/api';
 
 interface ContactSectionProps {
   onOpenResumeModal: () => void;
@@ -63,7 +64,7 @@ export default function ContactSection({
     setStatus('submitting');
 
     try {
-      const response = await fetch('/api/contact', {
+      const response = await fetch(API_ENDPOINTS.contact, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

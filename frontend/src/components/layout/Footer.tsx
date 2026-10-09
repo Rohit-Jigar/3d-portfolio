@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ExternalLink } from 'lucide-react';
+import { API_ENDPOINTS } from '../../services/api';
 
 interface HealthStatus {
   status: string;
@@ -16,7 +17,7 @@ export default function Footer({
   const [isLive, setIsLive] = useState<boolean | null>(null);
 
   useEffect(() => {
-    fetch('/api/health')
+    fetch(API_ENDPOINTS.health)
       .then((res) => {
         if (!res.ok) throw new Error('API offline');
         return res.json();
