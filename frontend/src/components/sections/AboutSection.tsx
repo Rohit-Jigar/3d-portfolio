@@ -7,9 +7,6 @@ interface DimensionCardProps {
   category: string;
   description: string;
   highlights: string[];
-  accentBorder: string;
-  accentBg: string;
-  badgeColor: string;
 }
 
 function DimensionCard({
@@ -18,9 +15,6 @@ function DimensionCard({
   category,
   description,
   highlights,
-  accentBorder,
-  accentBg,
-  badgeColor
 }: DimensionCardProps) {
   const [rotateX, setRotateX] = useState(0);
   const [rotateY, setRotateY] = useState(0);
@@ -33,8 +27,8 @@ function DimensionCard({
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
 
-    const rotX = ((y - centerY) / centerY) * -7;
-    const rotY = ((x - centerX) / centerX) * 7;
+    const rotX = ((y - centerY) / centerY) * -6;
+    const rotY = ((x - centerX) / centerX) * 6;
 
     setRotateX(rotX);
     setRotateY(rotY);
@@ -53,33 +47,33 @@ function DimensionCard({
         transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
         transition: 'transform 0.15s ease-out',
       }}
-      className={`relative rounded-2xl p-7 flex flex-col justify-between backdrop-blur-xl bg-slate-900/60 border ${accentBorder} shadow-xl group hover:shadow-2xl transition-all duration-300`}
+      className="relative rounded-2xl p-7 flex flex-col justify-between backdrop-blur-2xl bg-zinc-950/70 border border-white/10 hover:border-white/30 shadow-2xl group transition-all duration-300"
     >
       <div>
         {/* Top Header */}
         <div className="flex items-center justify-between mb-5">
-          <div className={`p-3 rounded-xl ${accentBg} border ${accentBorder} text-white shadow-md`}>
+          <div className="p-3 rounded-xl bg-white/5 border border-white/10 text-white shadow-inner group-hover:bg-white/10 transition-colors">
             {icon}
           </div>
-          <span className={`text-[11px] font-mono px-2.5 py-1 rounded-md ${badgeColor} border font-medium uppercase tracking-wider`}>
+          <span className="text-[10px] font-mono px-2.5 py-1 rounded-md bg-zinc-900 border border-white/10 text-zinc-300 uppercase tracking-widest font-semibold">
             {category}
           </span>
         </div>
 
-        <h3 className="text-xl font-bold text-gray-100 mb-2 group-hover:text-white transition-colors">
+        <h3 className="text-xl font-bold text-white mb-2 tracking-tight">
           {title}
         </h3>
 
-        <p className="text-sm text-gray-400 mb-6 leading-relaxed">
+        <p className="text-xs sm:text-sm text-zinc-400 mb-6 leading-relaxed font-light">
           {description}
         </p>
 
         {/* Feature bullets */}
-        <div className="space-y-2.5 border-t border-slate-800/80 pt-5">
+        <div className="space-y-2.5 border-t border-zinc-900 pt-5">
           {highlights.map((h, i) => (
-            <div key={i} className="flex items-start gap-2.5 text-xs text-gray-300">
-              <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400 shrink-0 mt-0.5" />
-              <span>{h}</span>
+            <div key={i} className="flex items-start gap-2.5 text-xs text-zinc-300">
+              <CheckCircle2 className="w-3.5 h-3.5 text-white shrink-0 mt-0.5" />
+              <span className="font-light">{h}</span>
             </div>
           ))}
         </div>
@@ -90,24 +84,20 @@ function DimensionCard({
 
 export default function AboutSection() {
   return (
-    <section id="about" className="relative py-28 px-6 bg-[#030712] border-t border-slate-900/80 overflow-hidden">
-      {/* Background glow decoration */}
-      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-96 h-96 bg-violet-500/5 rounded-full blur-3xl pointer-events-none" />
-
+    <section id="about" className="relative py-28 px-6 bg-black border-t border-zinc-900 overflow-hidden">
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/50 border border-cyan-500/30 text-xs font-mono text-cyan-300 mb-4">
-            <Layers className="w-3.5 h-3.5" />
-            <span>CORE ARCHITECTURAL IDENTITY</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-950 border border-white/10 text-xs font-mono text-zinc-300 mb-4">
+            <Layers className="w-3.5 h-3.5 text-white" />
+            <span className="tracking-wider uppercase text-[11px]">CORE ARCHITECTURAL IDENTITY</span>
           </div>
 
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight mb-6">
-            Engineering Systems <span className="text-gradient-cyan">Beyond the Surface</span>
+            Engineering Systems <span className="text-gradient-silver">Beyond the Surface</span>
           </h2>
 
-          <p className="text-base sm:text-lg text-gray-300 leading-relaxed font-light">
+          <p className="text-sm sm:text-base text-zinc-400 leading-relaxed font-light">
             I'm Jigar Rohit, a developer focused on building reliable backend systems, integrating AI capabilities, and solving complex engineering problems. My work includes high-volume data migration and transformation, enterprise inventory and ticketing systems, and multi-provider AI platforms. I enjoy connecting technologies into practical, maintainable solutions.
           </p>
         </div>
@@ -115,7 +105,7 @@ export default function AboutSection() {
         {/* Three Dimensional Focus Cards with 3D Tilt */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
           <DimensionCard
-            icon={<Server className="w-6 h-6 text-cyan-400" />}
+            icon={<Server className="w-5 h-5 text-white" />}
             title="Backend Engineering"
             category="APIs & Architecture"
             description="Building robust RESTful APIs, high-throughput asynchronous services, and secure business logic with PostgreSQL and Flyway versioning."
@@ -125,13 +115,10 @@ export default function AboutSection() {
               'Strict Pydantic payload sanitization & validation',
               'PostgreSQL schema design & Flyway migration scripts'
             ]}
-            accentBorder="border-cyan-500/30"
-            accentBg="bg-cyan-500/10"
-            badgeColor="bg-cyan-950/60 text-cyan-300 border-cyan-500/30"
           />
 
           <DimensionCard
-            icon={<Network className="w-6 h-6 text-violet-400" />}
+            icon={<Network className="w-5 h-5 text-white" />}
             title="AI & MCP Integration"
             category="Tool Calling & LLMs"
             description="Connecting autonomous AI models, Model Context Protocol (MCP) servers, multi-provider inference routing, and real-world tools."
@@ -141,13 +128,10 @@ export default function AboutSection() {
               'Intelligent prompt routing & latency-aware fallbacks',
               'Client-isolated API key security architecture'
             ]}
-            accentBorder="border-violet-500/30"
-            accentBg="bg-violet-500/10"
-            badgeColor="bg-violet-950/60 text-violet-300 border-violet-500/30"
           />
 
           <DimensionCard
-            icon={<Database className="w-6 h-6 text-blue-400" />}
+            icon={<Database className="w-5 h-5 text-white" />}
             title="Data Engineering"
             category="High-Volume ETL"
             description="Cleaning, validating, transforming, and migrating large datasets between systems with differing schema rules and acceptance constraints."
@@ -157,9 +141,6 @@ export default function AboutSection() {
               'Data cleansing, duplicate isolation & quarantine auditing',
               'Atomic batch ingestion with integrity reconciliation'
             ]}
-            accentBorder="border-blue-500/30"
-            accentBg="bg-blue-500/10"
-            badgeColor="bg-blue-950/60 text-blue-300 border-blue-500/30"
           />
         </div>
       </div>

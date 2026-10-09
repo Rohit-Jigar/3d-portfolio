@@ -1,98 +1,107 @@
 import React, { useRef, useMemo, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Float, Sphere, Torus } from '@react-three/drei';
+import { Float, Sphere, Torus, Octahedron } from '@react-three/drei';
 import * as THREE from 'three';
 
-// Interface for floating node data
 interface NodeData {
   id: string;
   label: string;
   category: string;
-  color: string;
-  position: [number, number, number];
-  orbitSpeed: number;
   orbitRadius: number;
+  orbitSpeed: number;
+  elevation: number;
+  angleOffset: number;
 }
 
 const NODES: NodeData[] = [
-  { id: 'mcp', label: 'MCP Protocol', category: 'Tool Calling', color: '#00f2fe', position: [2.8, 0.8, 0], orbitSpeed: 0.4, orbitRadius: 2.8 },
-  { id: 'python', label: 'Python Backend', category: 'Async Architecture', color: '#3b82f6', position: [-2.6, 1.2, 0.8], orbitSpeed: 0.35, orbitRadius: 2.7 },
-  { id: 'ai', label: 'AI Orchestration', category: 'Multi-Model', color: '#a855f7', position: [0.5, -2.2, 1.5], orbitSpeed: 0.45, orbitRadius: 2.5 },
-  { id: 'data', label: 'Data Migration', category: '~2M Records', color: '#22d3ee', position: [-2.2, -1.2, -1.0], orbitSpeed: 0.3, orbitRadius: 2.6 },
-  { id: 'postgres', label: 'PostgreSQL & RBAC', category: 'Flyway Versioned', color: '#818cf8', position: [2.2, -1.5, -0.8], orbitSpeed: 0.38, orbitRadius: 2.7 },
-  { id: 'fastapi', label: 'FastAPI Engine', category: 'High-Throughput', color: '#06b6d4', position: [-0.8, 2.4, -1.2], orbitSpeed: 0.42, orbitRadius: 2.6 },
+  { id: 'mcp', label: 'MCP Protocol', category: 'Tool Calling Architecture', orbitRadius: 3.1, orbitSpeed: 0.28, elevation: 0.6, angleOffset: 0 },
+  { id: 'python', label: 'Python Backend', category: 'Asynchronous Core', orbitRadius: 2.9, orbitSpeed: 0.22, elevation: -0.7, angleOffset: 1.05 },
+  { id: 'ai', label: 'AI Orchestration', category: 'Multi-Model Routing', orbitRadius: 3.2, orbitSpeed: 0.32, elevation: 0.9, angleOffset: 2.1 },
+  { id: 'data', label: 'Data Engineering', category: '~2M Records ETL', orbitRadius: 2.8, orbitSpeed: 0.25, elevation: -0.9, angleOffset: 3.14 },
+  { id: 'postgres', label: 'PostgreSQL & RBAC', category: 'Flyway Versioned', orbitRadius: 3.0, orbitSpeed: 0.29, elevation: 0.3, angleOffset: 4.2 },
+  { id: 'fastapi', label: 'FastAPI Engine', category: 'High-Throughput API', orbitRadius: 2.7, orbitSpeed: 0.35, elevation: -0.4, angleOffset: 5.2 },
 ];
 
-// Inner Central Futuristic Core
-function CentralCore({ hoveredNode }: { hoveredNode: string | null }) {
-  const coreRef = useRef<THREE.Group>(null);
-  const innerSphereRef = useRef<THREE.Mesh>(null);
+// Luxury Obsidian & Titanium Central Architectural Core
+function CentralArchitecturalCore({ hoveredNode }: { hoveredNode: string | null }) {
+  const groupRef = useRef<THREE.Group>(null);
+  const innerPolyhedronRef = useRef<THREE.Mesh>(null);
   const outerCageRef = useRef<THREE.Mesh>(null);
+  const ring1Ref = useRef<THREE.Mesh>(null);
+  const ring2Ref = useRef<THREE.Mesh>(null);
+  const ring3Ref = useRef<THREE.Mesh>(null);
 
   useFrame((state, delta) => {
-    if (coreRef.current) {
-      coreRef.current.rotation.y += delta * 0.25;
-      coreRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.4) * 0.15;
+    if (groupRef.current) {
+      groupRef.current.rotation.y += delta * 0.18;
+      groupRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.3) * 0.08;
+    }
+    if (innerPolyhedronRef.current) {
+      innerPolyhedronRef.current.rotation.y -= delta * 0.25;
+      innerPolyhedronRef.current.rotation.z += delta * 0.15;
+      const pulse = 1 + Math.sin(state.clock.elapsedTime * 1.8) * 0.035;
+      innerPolyhedronRef.current.scale.set(pulse, pulse, pulse);
     }
     if (outerCageRef.current) {
-      outerCageRef.current.rotation.x -= delta * 0.35;
-      outerCageRef.current.rotation.z += delta * 0.2;
+      outerCageRef.current.rotation.x += delta * 0.2;
+      outerCageRef.current.rotation.y += delta * 0.12;
     }
-    if (innerSphereRef.current) {
-      const pulse = 1 + Math.sin(state.clock.elapsedTime * 2) * 0.06;
-      innerSphereRef.current.scale.set(pulse, pulse, pulse);
-    }
+    if (ring1Ref.current) ring1Ref.current.rotation.z += delta * 0.35;
+    if (ring2Ref.current) ring2Ref.current.rotation.y -= delta * 0.25;
+    if (ring3Ref.current) ring3Ref.current.rotation.x += delta * 0.3;
   });
 
-  const coreColor = hoveredNode ? '#00f2fe' : '#38bdf8';
-  const cageColor = hoveredNode ? '#c084fc' : '#818cf8';
-
   return (
-    <group ref={coreRef}>
-      {/* Central glowing emissive orb */}
-      <Sphere ref={innerSphereRef} args={[0.9, 32, 32]}>
-        <meshStandardMaterial
-          color="#0f172a"
-          emissive={coreColor}
-          emissiveIntensity={hoveredNode ? 1.6 : 0.9}
-          roughness={0.2}
-          metalness={0.8}
+    <group ref={groupRef}>
+      {/* 1. Deep Obsidian Core Orb */}
+      <Sphere ref={innerPolyhedronRef} args={[0.95, 32, 32]}>
+        <meshPhysicalMaterial
+          color="#09090b"
+          emissive={hoveredNode ? '#ffffff' : '#27272a'}
+          emissiveIntensity={hoveredNode ? 0.4 : 0.15}
+          roughness={0.15}
+          metalness={0.9}
+          clearcoat={1}
+          clearcoatRoughness={0.1}
+          reflectivity={1}
         />
       </Sphere>
 
-      {/* Futuristic wireframe icosahedron cage */}
+      {/* 2. Precision Crystalline Octahedral Cage */}
       <mesh ref={outerCageRef}>
-        <icosahedronGeometry args={[1.35, 1]} />
+        <icosahedronGeometry args={[1.42, 1]} />
         <meshStandardMaterial
-          color={cageColor}
+          color="#ffffff"
           wireframe
           wireframeLinewidth={1.5}
-          emissive={cageColor}
-          emissiveIntensity={0.8}
           transparent
-          opacity={0.7}
+          opacity={hoveredNode ? 0.75 : 0.45}
+          metalness={0.95}
+          roughness={0.1}
         />
       </mesh>
 
-      {/* Orbital Ring 1 */}
-      <Torus args={[1.7, 0.02, 16, 100]} rotation={[Math.PI / 3, 0, 0]}>
-        <meshBasicMaterial color="#00f2fe" transparent opacity={0.4} />
+      {/* 3. Concentric Gyroscopic Titanium Rings */}
+      <Torus ref={ring1Ref} args={[1.85, 0.018, 16, 120]} rotation={[Math.PI / 3, 0, 0]}>
+        <meshStandardMaterial color="#e4e4e7" metalness={0.9} roughness={0.2} transparent opacity={0.6} />
       </Torus>
 
-      {/* Orbital Ring 2 */}
-      <Torus args={[2.0, 0.015, 16, 100]} rotation={[-Math.PI / 4, Math.PI / 6, 0]}>
-        <meshBasicMaterial color="#a855f7" transparent opacity={0.35} />
+      <Torus ref={ring2Ref} args={[2.15, 0.012, 16, 120]} rotation={[-Math.PI / 4, Math.PI / 5, 0]}>
+        <meshStandardMaterial color="#a1a1aa" metalness={0.95} roughness={0.1} transparent opacity={0.45} />
       </Torus>
 
-      {/* Point lights localized at core center */}
-      <pointLight color="#00f2fe" intensity={3} distance={6} />
-      <pointLight color="#a855f7" intensity={2} distance={5} />
+      <Torus ref={ring3Ref} args={[2.45, 0.008, 16, 120]} rotation={[0, Math.PI / 2, Math.PI / 6]}>
+        <meshStandardMaterial color="#ffffff" metalness={1} roughness={0.05} transparent opacity={0.3} />
+      </Torus>
+
+      {/* Crisp White Studio Point Light Source */}
+      <pointLight color="#ffffff" intensity={4.5} distance={7} decay={2} />
     </group>
   );
 }
 
-// Orbiting Interactive Node
-function OrbitingNode({
+// Precision Machined Monolithic Orbiting Node
+function OrbitingMonolith({
   node,
   isHovered,
   onHover,
@@ -103,53 +112,65 @@ function OrbitingNode({
   onHover: (id: string) => void;
   onLeave: () => void;
 }) {
-  const groupRef = useRef<THREE.Group>(null);
-  const initialAngle = useMemo(() => Math.random() * Math.PI * 2, []);
+  const meshRef = useRef<THREE.Group>(null);
 
   useFrame((state) => {
-    if (groupRef.current) {
-      const time = state.clock.elapsedTime * node.orbitSpeed + initialAngle;
+    if (meshRef.current) {
+      const time = state.clock.elapsedTime * node.orbitSpeed + node.angleOffset;
       const x = Math.cos(time) * node.orbitRadius;
       const z = Math.sin(time) * node.orbitRadius;
-      const y = Math.sin(time * 1.5) * 0.6;
-      groupRef.current.position.set(x, y, z);
+      const y = node.elevation + Math.sin(time * 1.6) * 0.25;
+      meshRef.current.position.set(x, y, z);
+      meshRef.current.rotation.y = -time;
+      meshRef.current.rotation.x = Math.sin(time) * 0.2;
     }
   });
 
   return (
     <group
-      ref={groupRef}
+      ref={meshRef}
       onPointerOver={(e) => {
         e.stopPropagation();
         onHover(node.id);
       }}
       onPointerOut={() => onLeave()}
     >
-      <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
-        <Sphere args={[0.22, 16, 16]}>
+      <Float speed={2.5} rotationIntensity={0.6} floatIntensity={0.4}>
+        {/* Monolithic Gem-faceted Node */}
+        <Octahedron args={[0.22, 0]}>
+          <meshPhysicalMaterial
+            color={isHovered ? '#ffffff' : '#18181b'}
+            emissive={isHovered ? '#ffffff' : '#27272a'}
+            emissiveIntensity={isHovered ? 1.2 : 0.2}
+            metalness={0.9}
+            roughness={0.1}
+            clearcoat={1}
+          />
+        </Octahedron>
+
+        {/* Fine Halo Ring */}
+        <Torus args={[0.34, 0.012, 12, 48]}>
           <meshStandardMaterial
-            color={node.color}
-            emissive={node.color}
-            emissiveIntensity={isHovered ? 2.5 : 1.3}
+            color="#ffffff"
+            transparent
+            opacity={isHovered ? 0.9 : 0.25}
+            metalness={1}
             roughness={0.1}
           />
-        </Sphere>
-        <Torus args={[0.32, 0.018, 8, 32]}>
-          <meshBasicMaterial color={node.color} transparent opacity={isHovered ? 0.9 : 0.5} />
         </Torus>
       </Float>
     </group>
   );
 }
 
-// Particle field with robust uniform color
-function Particles({ count = 220 }: { count?: number }) {
+// Minimalist Starfield Particle Matrix (Pure White & Silver)
+function ParticleMatrix({ count = 260 }: { count?: number }) {
   const pointsRef = useRef<THREE.Points>(null);
 
   const positions = useMemo(() => {
     const pos = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
-      const radius = 3.5 + Math.random() * 5.0;
+      const radius = 3.2 + Math.random() * 5.8;
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(Math.random() * 2 - 1);
 
@@ -162,8 +183,8 @@ function Particles({ count = 220 }: { count?: number }) {
 
   useFrame((_, delta) => {
     if (pointsRef.current) {
-      pointsRef.current.rotation.y += delta * 0.04;
-      pointsRef.current.rotation.x += delta * 0.02;
+      pointsRef.current.rotation.y += delta * 0.025;
+      pointsRef.current.rotation.x += delta * 0.012;
     }
   });
 
@@ -176,39 +197,39 @@ function Particles({ count = 220 }: { count?: number }) {
         />
       </bufferGeometry>
       <pointsMaterial
-        size={0.04}
-        color="#38bdf8"
+        size={0.035}
+        color="#ffffff"
         transparent
-        opacity={0.65}
+        opacity={0.55}
         sizeAttenuation
       />
     </points>
   );
 }
 
-// Camera Mouse Parallax Controller
-function MouseParallax() {
+// Camera Mouse Parallax Rig
+function CameraParallax() {
   useFrame((state) => {
-    const targetX = state.pointer.x * 0.8;
-    const targetY = state.pointer.y * 0.5;
-    state.camera.position.x = THREE.MathUtils.lerp(state.camera.position.x, targetX, 0.05);
-    state.camera.position.y = THREE.MathUtils.lerp(state.camera.position.y, targetY, 0.05);
+    const targetX = state.pointer.x * 0.9;
+    const targetY = state.pointer.y * 0.6;
+    state.camera.position.x = THREE.MathUtils.lerp(state.camera.position.x, targetX, 0.04);
+    state.camera.position.y = THREE.MathUtils.lerp(state.camera.position.y, targetY, 0.04);
     state.camera.lookAt(0, 0, 0);
   });
   return null;
 }
 
-// Fallback component for devices without WebGL or reduced motion
+// Professional Monochrome 2D Fallback
 export function HeroFallback2D() {
   return (
-    <div className="relative w-full h-full flex items-center justify-center p-6 bg-gradient-to-b from-slate-950 via-slate-900 to-black overflow-hidden">
-      <div className="absolute inset-0 bg-cyber-grid opacity-30"></div>
+    <div className="relative w-full h-full flex items-center justify-center p-6 bg-black overflow-hidden">
+      <div className="absolute inset-0 bg-architect-grid opacity-30"></div>
       <div className="relative z-10 flex flex-col items-center text-center">
-        <div className="relative w-48 h-48 mb-6 flex items-center justify-center">
-          <div className="absolute inset-0 rounded-full bg-cyan-500/10 animate-ping"></div>
-          <div className="w-36 h-36 rounded-full border border-cyan-500/40 border-dashed animate-spin flex items-center justify-center [animation-duration:15s]">
-            <div className="w-24 h-24 rounded-full border border-violet-500/50 flex items-center justify-center bg-slate-900/80 backdrop-blur-md">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-cyan-400 to-violet-500 shadow-lg shadow-cyan-500/50"></div>
+        <div className="relative w-48 h-48 mb-8 flex items-center justify-center">
+          <div className="absolute inset-0 rounded-full border border-white/10 animate-ping [animation-duration:4s]"></div>
+          <div className="w-40 h-40 rounded-full border border-white/20 border-dashed animate-spin flex items-center justify-center [animation-duration:24s]">
+            <div className="w-28 h-28 rounded-full border border-white/40 flex items-center justify-center bg-zinc-950/80 backdrop-blur-md">
+              <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-white to-zinc-400 shadow-2xl shadow-white/30"></div>
             </div>
           </div>
         </div>
@@ -216,7 +237,7 @@ export function HeroFallback2D() {
           {NODES.map((n) => (
             <span
               key={n.id}
-              className="px-2.5 py-1 text-xs font-mono rounded-full bg-slate-800/80 border border-cyan-500/30 text-cyan-300"
+              className="px-3 py-1 text-xs font-mono rounded-full bg-zinc-900 border border-white/15 text-zinc-300"
             >
               {n.label}
             </span>
@@ -227,7 +248,6 @@ export function HeroFallback2D() {
   );
 }
 
-// Error Boundary for WebGL
 class WebGLErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
   constructor(props: { children: React.ReactNode }) {
     super(props);
@@ -237,7 +257,7 @@ class WebGLErrorBoundary extends React.Component<{ children: React.ReactNode }, 
     return { hasError: true };
   }
   override componentDidCatch(error: Error) {
-    console.warn('WebGL Rendering fallback triggered:', error);
+    console.warn('WebGL fallback activated:', error);
   }
   override render() {
     if (this.state.hasError) {
@@ -281,18 +301,22 @@ export default function HeroScene3D({
     <div className="w-full h-full relative">
       <WebGLErrorBoundary>
         <Canvas
-          camera={{ position: [0, 0, 6.2], fov: 45 }}
+          camera={{ position: [0, 0, 6.4], fov: 42 }}
           gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
           dpr={[1, 1.5]}
         >
-          <ambientLight intensity={0.6} />
-          <directionalLight position={[10, 10, 5]} intensity={1.2} color="#ffffff" />
-          <directionalLight position={[-10, -10, -5]} intensity={0.5} color="#8b5cf6" />
+          {/* Studio Monochromatic Lighting */}
+          <ambientLight intensity={0.4} />
+          <directionalLight position={[8, 12, 6]} intensity={3.0} color="#ffffff" />
+          <directionalLight position={[-8, -6, -4]} intensity={1.2} color="#a1a1aa" />
+          <pointLight position={[0, -3, 2]} intensity={1.5} color="#e4e4e7" />
 
-          <CentralCore hoveredNode={hoveredNode} />
+          {/* Central Architectural Obsidian & Titanium Core */}
+          <CentralArchitecturalCore hoveredNode={hoveredNode} />
 
+          {/* Monolithic Orbiting Nodes */}
           {NODES.map((node) => (
-            <OrbitingNode
+            <OrbitingMonolith
               key={node.id}
               node={node}
               isHovered={hoveredNode === node.id}
@@ -301,8 +325,11 @@ export default function HeroScene3D({
             />
           ))}
 
-          <Particles count={220} />
-          <MouseParallax />
+          {/* Fine Particle Matrix */}
+          <ParticleMatrix count={240} />
+
+          {/* Parallax Camera Interaction */}
+          <CameraParallax />
         </Canvas>
       </WebGLErrorBoundary>
     </div>

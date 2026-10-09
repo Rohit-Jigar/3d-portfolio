@@ -2,11 +2,11 @@
 
 @layer base {
   :root {
-    --color-bg-primary: #030712;
-    --color-bg-secondary: #0a0f1d;
-    --color-accent-cyan: #00f2fe;
-    --color-accent-violet: #8b5cf6;
-    --color-accent-blue: #3b82f6;
+    --color-bg-pure: #000000;
+    --color-bg-surface: #09090b;
+    --color-bg-card: #111113;
+    --color-border-subtle: rgba(255, 255, 255, 0.08);
+    --color-border-hover: rgba(255, 255, 255, 0.22);
   }
 
   html {
@@ -15,82 +15,75 @@
   }
 
   body {
-    background-color: #030712;
-    color: #f3f4f6;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: #000000;
+    color: #f4f4f5;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     overflow-x: hidden;
     margin: 0;
     padding: 0;
   }
 
-  /* Custom dark scrollbar */
+  /* Monochrome minimal scrollbar */
   ::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: #030712;
+    background: #000000;
   }
   ::-webkit-scrollbar-thumb {
-    background: #1f2937;
-    border-radius: 4px;
-    border: 1px solid rgba(0, 242, 254, 0.2);
+    background: #27272a;
+    border-radius: 3px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #374151;
+    background: #3f3f46;
   }
 }
 
-/* Glassmorphism utility classes */
+/* Luxury Monochrome Glassmorphism */
 .glass-panel {
-  background: rgba(15, 23, 42, 0.65);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(12, 12, 14, 0.72);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.glass-panel-glow {
-  background: rgba(15, 23, 42, 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(0, 242, 254, 0.25);
-  box-shadow: 0 0 25px -5px rgba(0, 242, 254, 0.15), 0 0 10px -5px rgba(139, 92, 246, 0.2);
+.glass-panel-hover {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glass-panel-hover:hover {
+  background: rgba(18, 18, 22, 0.85);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 0 30px -10px rgba(255, 255, 255, 0.08);
 }
 
-.glass-panel-violet {
-  background: rgba(15, 23, 42, 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(139, 92, 246, 0.25);
-  box-shadow: 0 0 25px -5px rgba(139, 92, 246, 0.15);
-}
-
-/* Gradient text */
-.text-gradient-cyan {
-  background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+/* Silver & White Metallic Typography */
+.text-gradient-silver {
+  background: linear-gradient(180deg, #ffffff 15%, #a1a1aa 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.text-gradient-violet {
-  background: linear-gradient(135deg, #c084fc 0%, #8b5cf6 50%, #3b82f6 100%);
+.text-gradient-crisp {
+  background: linear-gradient(180deg, #ffffff 40%, #d4d4d8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.text-gradient-multi {
-  background: linear-gradient(135deg, #00f2fe 0%, #a855f7 50%, #ec4899 100%);
+.text-gradient-subtle {
+  background: linear-gradient(180deg, #e4e4e7 0%, #71717a 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-/* Cyber grid background */
-.bg-cyber-grid {
+/* Minimalist Architectural Grid */
+.bg-architect-grid {
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
+    linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 48px 48px;
 }
 
-.bg-radial-glow {
-  background: radial-gradient(circle at 50% 20%, rgba(0, 242, 254, 0.08) 0%, rgba(139, 92, 246, 0.04) 40%, transparent 70%);
+/* Soft Spotlight / Vignette */
+.bg-vignette {
+  background: radial-gradient(circle at 50% 25%, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 40%, transparent 70%);
 }

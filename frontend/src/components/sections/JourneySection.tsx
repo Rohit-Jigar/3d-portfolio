@@ -18,17 +18,17 @@ interface PrincipleCardProps {
 
 function PrincipleCard({ number, title, description, icon }: PrincipleCardProps) {
   return (
-    <div className="p-5 rounded-2xl bg-slate-900/50 border border-slate-800/80 hover:border-cyan-500/30 transition-all duration-200 group">
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-xs font-mono font-bold text-cyan-400/80">{number}</span>
-        <div className="p-2 rounded-lg bg-slate-800/80 text-gray-300 group-hover:text-cyan-300 transition-colors">
+    <div className="p-6 rounded-2xl bg-zinc-950/70 border border-white/10 hover:border-white/30 transition-all duration-200 group">
+      <div className="flex items-center justify-between mb-4">
+        <span className="text-xs font-mono font-bold text-zinc-500">{number}</span>
+        <div className="p-2.5 rounded-xl bg-white/5 text-white border border-white/10 group-hover:bg-white/10 transition-colors">
           {icon}
         </div>
       </div>
-      <h4 className="text-sm font-bold text-gray-200 mb-1.5 group-hover:text-white transition-colors">
+      <h4 className="text-sm font-bold text-white mb-2 tracking-tight">
         {title}
       </h4>
-      <p className="text-xs text-gray-400 font-light leading-relaxed">
+      <p className="text-xs text-zinc-400 font-light leading-relaxed">
         {description}
       </p>
     </div>
@@ -68,40 +68,40 @@ const MILESTONES = [
 
 export default function JourneySection() {
   return (
-    <section id="journey" className="relative py-28 px-6 bg-[#030712] border-t border-slate-900/80">
+    <section id="journey" className="relative py-28 px-6 bg-black border-t border-zinc-900">
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/50 border border-cyan-500/30 text-xs font-mono text-cyan-300 mb-4">
-            <Compass className="w-3.5 h-3.5 text-cyan-400" />
-            <span>ENGINEERING PATH & PRINCIPLES</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-950 border border-white/10 text-xs font-mono text-zinc-300 mb-4">
+            <Compass className="w-3.5 h-3.5 text-white" />
+            <span className="tracking-wider uppercase text-[11px]">ENGINEERING PATH & PRINCIPLES</span>
           </div>
 
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight mb-4">
-            Selected <span className="text-gradient-cyan">Engineering Work</span>
+            Selected <span className="text-gradient-silver">Engineering Work</span>
           </h2>
 
-          <p className="text-base text-gray-400 font-light">
+          <p className="text-sm sm:text-base text-zinc-400 font-light">
             A track record grounded in real system implementations: high-volume data transformation, enterprise backend design, multi-model AI routing, and protocol integrations.
           </p>
         </div>
 
         {/* Selected Engineering Work Timeline */}
-        <div className="mb-20 space-y-6">
+        <div className="mb-20 space-y-4">
           {MILESTONES.map((item, index) => (
             <div
               key={index}
-              className="p-6 rounded-2xl bg-slate-900/40 border border-slate-800/80 hover:border-cyan-500/30 backdrop-blur-md transition-all duration-200"
+              className="p-6 rounded-2xl bg-zinc-950/80 border border-white/10 hover:border-white/25 backdrop-blur-xl transition-all duration-200"
             >
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-3">
-                <span className="text-xs font-mono text-cyan-400 uppercase tracking-wider font-semibold">
+                <span className="text-xs font-mono text-zinc-300 uppercase tracking-wider font-semibold">
                   {item.category}
                 </span>
                 <div className="flex flex-wrap gap-1.5">
                   {item.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-gray-300 border border-slate-700/60"
+                      className="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-900 text-zinc-400 border border-white/8"
                     >
                       {tag}
                     </span>
@@ -109,11 +109,11 @@ export default function JourneySection() {
                 </div>
               </div>
 
-              <h3 className="text-lg font-bold text-white mb-2">
+              <h3 className="text-lg font-bold text-white mb-2 tracking-tight">
                 {item.title}
               </h3>
 
-              <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-light">
+              <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed font-light">
                 {item.description}
               </p>
             </div>
@@ -122,11 +122,11 @@ export default function JourneySection() {
 
         {/* 6 Engineering Principles Section */}
         <div>
-          <div className="text-center max-w-2xl mx-auto mb-10">
-            <h3 className="text-2xl font-bold text-white mb-2">
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <h3 className="text-2xl font-bold text-white mb-2 tracking-tight">
               Engineering Principles
             </h3>
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-zinc-400 font-light">
               The foundational tenets that guide my backend design, integration architecture, and data pipelines.
             </p>
           </div>
@@ -136,37 +136,37 @@ export default function JourneySection() {
               number="01"
               title="Reliability Before Unnecessary Complexity"
               description="Prioritizing simple, auditable, and resilient architectures over speculative abstractions that increase failure modes."
-              icon={<Shield className="w-4 h-4 text-cyan-400" />}
+              icon={<Shield className="w-4 h-4 text-white" />}
             />
             <PrincipleCard
               number="02"
               title="Clear Separation of Concerns"
               description="Decoupling data access, API routing, business logic, and presentation layers for independent scalability and testability."
-              icon={<Layers className="w-4 h-4 text-violet-400" />}
+              icon={<Layers className="w-4 h-4 text-white" />}
             />
             <PrincipleCard
               number="03"
               title="Secure Handling of Credentials"
               description="Zero secrets in client code or repositories. Environment-based injection, client-isolated sessions, and strict principle of least privilege."
-              icon={<KeyRound className="w-4 h-4 text-emerald-400" />}
+              icon={<KeyRound className="w-4 h-4 text-white" />}
             />
             <PrincipleCard
               number="04"
               title="Maintainable & Testable Code"
               description="Writing clean, typed, modular code backed by automated unit tests, strict validation schemas, and reproducible migrations."
-              icon={<FileCheck2 className="w-4 h-4 text-blue-400" />}
+              icon={<FileCheck2 className="w-4 h-4 text-white" />}
             />
             <PrincipleCard
               number="05"
               title="Explicit Validation & Error Handling"
               description="Never assuming input sanity. Enforcing strict non-null checks, Pydantic type validation, and graceful failure isolation."
-              icon={<AlertTriangle className="w-4 h-4 text-amber-400" />}
+              icon={<AlertTriangle className="w-4 h-4 text-white" />}
             />
             <PrincipleCard
               number="06"
               title="Performance-Aware Architecture"
               description="Designing memory-conscious generators, database connection pools, async non-blocking I/O, and latency-optimized routing."
-              icon={<Zap className="w-4 h-4 text-rose-400" />}
+              icon={<Zap className="w-4 h-4 text-white" />}
             />
           </div>
         </div>
