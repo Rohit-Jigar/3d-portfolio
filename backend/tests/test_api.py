@@ -48,6 +48,10 @@ def test_get_project_by_slug_not_found():
 
 
 def test_contact_form_valid():
+    from backend.app.routers.contact import _ip_requests
+    from backend.app.database import get_inquiry_by_ticket_id
+
+    _ip_requests.clear()
     payload = {
         "name": "Alex TechRecruiter",
         "email": "alex.recruiter@example.com",
@@ -60,6 +64,16 @@ def test_contact_form_valid():
     assert data["success"] is True
     assert "ticket_id" in data
     assert data["ticket_id"].startswith("MSG-")
+
+    # Verify inquiry was immediately saved to the SQLite database
+    saved = get_inquiry_by_ticket_id(data["ticket_id"])
+    assert saved is not None
+    assert saved["ticket_id"] == data["ticket_id"]
+    assert saved["name"] == "Alex TechRecruiter"
+    assert saved["email"] == "alex.recruiter@example.com"
+    assert saved["subject"] == "Interview Opportunity: Senior Python / AI Engineer"
+    assert "thoroughly impressed" in saved["message"]
+    assert saved["email_status"] == "pending"
 
 
 def test_contact_form_invalid_email():
@@ -191,3 +205,89 @@ def test_send_inquiry_notification_falls_back_to_formsubmit():
         )
         assert result is True
         mock_fs.assert_called_once()
+
+
+def test_get_inquiries_endpoint():
+    response = client.get("/api/inquiries")
+    assert response.status_code == 200
+    inquiries = response.json()
+    assert isinstance(inquiries, list)
+    assert len(inquiries) >= 1
+    # Verify structure of inquiry records
+    first = inquiries[0]
+    assert "id" in first
+    assert "ticket_id" in first
+    assert "name" in first
+    assert "email" in first
+    assert "subject" in first
+    assert "message" in first
+    assert "created_at" in first
+    assert "is_read" in first
+    assert "email_status" in first or "status" in first
+
+
+def test_get_inquiries_stats_endpoint():
+    response = client.get("/api/inquiries/stats")
+    assert response.status_code == 200
+    stats = response.json()
+    assert "total" in stats
+    assert stats["total"] >= 1
+    assert "unread" in stats
+    assert "read" in stats
+    assert "by_status" in stats
+    assert isinstance(stats["by_status"], dict)
+    assert "by_provider" in stats
+    assert isinstance(stats["by_provider"], dict)
+
+
+def test_inquiries_pagination_and_query_params():
+    response = client.get("/api/inquiries?limit=1&offset=0")
+    assert response.status_code == 200
+    items = response.json()
+    assert isinstance(items, list)
+    assert len(items) <= 1
+
+
+def test_database_direct_inquiry_lifecycle():
+    import uuid
+    from backend.app.database import (
+        save_inquiry,
+        get_inquiry_by_ticket_id,
+        update_email_status,
+        mark_inquiry_read,
+        get_inquiry_stats
+    )
+    test_ticket = f"MSG-TEST-{uuid.uuid4().hex[:8].upper()}"
+    saved = save_inquiry(
+        ticket_id=test_ticket,
+        name="Test Recruiter",
+        email="test.recruiter@example.com",
+        subject="Integration Verification",
+        message="Checking database persistence pipeline directly.",
+        client_ip="192.168.1.50",
+        status="pending"
+    )
+    assert saved["ticket_id"] == test_ticket
+    assert saved["name"] == "Test Recruiter"
+    assert saved["email"] == "test.recruiter@example.com"
+    assert saved["client_ip"] == "192.168.1.50"
+
+    fetched = get_inquiry_by_ticket_id(test_ticket)
+    assert fetched is not None
+    assert fetched["ticket_id"] == test_ticket
+
+    # Test updating status
+    updated = update_email_status(test_ticket, "sent", provider="smtp")
+    assert updated is True
+    fetched_after = get_inquiry_by_ticket_id(test_ticket)
+    assert fetched_after["email_status"] == "sent"
+
+    # Test marking as read
+    marked = mark_inquiry_read(test_ticket, 1)
+    assert marked is True
+    fetched_read = get_inquiry_by_ticket_id(test_ticket)
+    assert fetched_read["is_read"] == 1
+
+    stats = get_inquiry_stats()
+    assert stats["total"] >= 1
+

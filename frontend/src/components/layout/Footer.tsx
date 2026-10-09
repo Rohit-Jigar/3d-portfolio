@@ -8,11 +8,15 @@ interface HealthStatus {
   timestamp?: string;
 }
 
+interface FooterProps {
+  onOpenGithubModal: () => void;
+  onOpenInquiriesModal?: () => void;
+}
+
 export default function Footer({
   onOpenGithubModal,
-}: {
-  onOpenGithubModal: () => void;
-}) {
+  onOpenInquiriesModal,
+}: FooterProps) {
   const [health, setHealth] = useState<HealthStatus | null>(null);
   const [isLive, setIsLive] = useState<boolean | null>(null);
 
@@ -71,7 +75,17 @@ export default function Footer({
         </div>
 
         {/* Links */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3.5 flex-wrap">
+          {onOpenInquiriesModal && (
+            <button
+              onClick={onOpenInquiriesModal}
+              className="text-[11px] font-mono text-zinc-400 hover:text-white px-2.5 py-1 rounded-lg bg-zinc-950 hover:bg-zinc-900 border border-white/10 hover:border-white/20 transition-all flex items-center gap-1.5 cursor-pointer"
+              title="Inspect Live Inquiries Feed"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span>[Inquiries Feed]</span>
+            </button>
+          )}
           <a
             href="https://www.linkedin.com/in/jigar-rohit-874aa0374/"
             target="_blank"

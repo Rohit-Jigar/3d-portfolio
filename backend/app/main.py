@@ -1,8 +1,10 @@
 import logging
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.app.config import settings
-from backend.app.routers import health, projects, contact, simulations
+from backend.app.database import init_db
+from backend.app.routers import health, projects, contact, simulations, inquiries
 
 logging.basicConfig(
     level=logging.INFO,
@@ -10,12 +12,22 @@ logging.basicConfig(
 )
 logger = logging.getLogger("portfolio.api")
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: Initialize SQLite database and tables
+    logger.info("Initializing SQLite database on app startup...")
+    init_db()
+    yield
+
+
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
     description="Backend API for Jigar Rohit's 3D Engineering Portfolio - MCP, Python Backend & AI/LLM Systems.",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
+    lifespan=lifespan
 )
 
 # CORS Middleware configuration
@@ -32,6 +44,7 @@ app.include_router(health.router)
 app.include_router(projects.router)
 app.include_router(contact.router)
 app.include_router(simulations.router)
+app.include_router(inquiries.router)
 
 
 @app.get("/")

@@ -123,6 +123,26 @@ export default function ContactSection({
       // Ensure the direct email dispatch has finished
       await emailPromise;
 
+      // Also cache in local inquiries store for instant Live Feed display
+      try {
+        const localInquiry = {
+          ticket_id: ticketId,
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+          timestamp: new Date().toISOString()
+        };
+        const raw = localStorage.getItem('portfolio_local_inquiries');
+        const existing = raw ? JSON.parse(raw) : [];
+        localStorage.setItem(
+          'portfolio_local_inquiries',
+          JSON.stringify([localInquiry, ...existing.filter((item: any) => item.ticket_id !== ticketId)].slice(0, 50))
+        );
+      } catch {
+        // Safe ignore if localStorage disabled
+      }
+
       setSuccessDetails({
         ticketId,
         message: confirmationMessage

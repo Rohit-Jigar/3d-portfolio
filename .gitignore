@@ -20,6 +20,12 @@ dist/
 .coverage
 htmlcov/
 
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+backend/data/*.db
+
 # Environment and secrets (Never commit!)
 .env
 *.env.local

@@ -12,6 +12,7 @@ const API_BASE = (
 export const API_ENDPOINTS = {
   health: `${API_BASE}/api/health`,
   contact: `${API_BASE}/api/contact`,
+  inquiries: `${API_BASE}/api/inquiries`,
   projects: `${API_BASE}/api/projects`,
   simulationsMcp: `${API_BASE}/api/simulations/mcp`,
   simulationsRouter: `${API_BASE}/api/simulations/router`,

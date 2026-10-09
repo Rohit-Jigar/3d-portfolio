@@ -3,6 +3,7 @@ import { Menu, X, FileText, ExternalLink } from 'lucide-react';
 
 interface NavbarProps {
   onOpenResumeModal: () => void;
+  onOpenInquiriesModal?: () => void;
 }
 
 const NAV_ITEMS = [
@@ -16,7 +17,7 @@ const NAV_ITEMS = [
   { label: 'Contact', href: '#contact' },
 ];
 
-export default function Navbar({ onOpenResumeModal }: NavbarProps) {
+export default function Navbar({ onOpenResumeModal, onOpenInquiriesModal }: NavbarProps) {
   const [activeSection, setActiveSection] = useState('hero');
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -105,7 +106,18 @@ export default function Navbar({ onOpenResumeModal }: NavbarProps) {
         </div>
 
         {/* Action CTAs */}
-        <div className="hidden sm:flex items-center gap-2.5">
+        <div className="hidden sm:flex items-center gap-2">
+          {onOpenInquiriesModal && (
+            <button
+              onClick={onOpenInquiriesModal}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-mono font-medium rounded-lg text-zinc-400 hover:text-white bg-zinc-900/60 hover:bg-zinc-850 border border-white/10 hover:border-white/20 transition-all focus:outline-none focus:ring-1 focus:ring-white cursor-pointer"
+              title="Inspect Live Inquiries Feed"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span>Inbox</span>
+            </button>
+          )}
+
           <button
             onClick={onOpenResumeModal}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-medium rounded-lg text-zinc-300 hover:text-white bg-zinc-900 hover:bg-zinc-800 border border-white/10 hover:border-white/20 transition-all focus:outline-none focus:ring-1 focus:ring-white cursor-pointer"
@@ -154,6 +166,18 @@ export default function Navbar({ onOpenResumeModal }: NavbarProps) {
               </a>
             ))}
             <div className="pt-4 border-t border-zinc-800 flex flex-col gap-2.5 mt-2">
+              {onOpenInquiriesModal && (
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onOpenInquiriesModal();
+                  }}
+                  className="w-full flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg bg-zinc-900 text-zinc-200 hover:bg-zinc-800 border border-white/10"
+                >
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  Inquiries Live Feed
+                </button>
+              )}
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);

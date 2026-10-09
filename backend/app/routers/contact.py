@@ -5,6 +5,7 @@ from collections import defaultdict
 from fastapi import APIRouter, HTTPException, Request, BackgroundTasks
 from backend.app.schemas import ContactRequest, ContactResponse
 from backend.app.services.email_service import send_inquiry_notification
+from backend.app.database import save_inquiry
 
 logger = logging.getLogger("portfolio.contact")
 router = APIRouter(prefix="/api", tags=["Contact"])
@@ -55,6 +56,19 @@ async def submit_contact_form(
         ticket_id,
         payload.name[:30],
         payload.subject[:40]
+    )
+
+    # Immediately persist inquiry to SQLite database before queuing background email dispatch
+    save_inquiry(
+        ticket_id=ticket_id,
+        name=payload.name,
+        email=payload.email,
+        subject=payload.subject,
+        message=payload.message,
+        client_ip=client_ip,
+        status="pending",
+        email_status="pending",
+        created_at=timestamp_str
     )
 
     # Queue asynchronous email notification to Jigar Rohit's inbox

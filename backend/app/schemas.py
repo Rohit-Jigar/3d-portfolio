@@ -83,3 +83,30 @@ class RouterSimulateResponse(BaseModel):
     estimated_latency_ms: int
     fallback_chain: List[str]
     cost_tier: str
+
+
+class InquiryRecord(BaseModel):
+    id: int
+    ticket_id: str
+    name: str
+    email: str
+    subject: str
+    message: str
+    client_ip: Optional[str] = None
+    email_status: str = "pending"
+    status: Optional[str] = "pending"
+    provider: str = "direct"
+    created_at: str
+    is_read: int = 0
+
+
+class InquiryStatsResponse(BaseModel):
+    total: int
+    total_inquiries: int
+    unread: int
+    unread_inquiries: int
+    read: int
+    read_inquiries: int
+    by_status: Dict[str, int]
+    by_provider: Dict[str, int]
+    latest_inquiry_at: Optional[str] = None

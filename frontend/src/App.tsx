@@ -10,16 +10,21 @@ import JourneySection from './components/sections/JourneySection';
 import LabSection from './components/sections/LabSection';
 import ContactSection from './components/sections/ContactSection';
 import Modal from './components/ui/Modal';
+import InquiriesModal from './components/ui/InquiriesModal';
 import { Download, CheckCircle, Terminal } from 'lucide-react';
 
 export default function App() {
   const [resumeModalOpen, setResumeModalOpen] = useState(false);
   const [githubModalOpen, setGithubModalOpen] = useState(false);
+  const [inquiriesModalOpen, setInquiriesModalOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-black text-zinc-100 flex flex-col font-sans selection:bg-white selection:text-black">
       {/* Top Floating Navigation */}
-      <Navbar onOpenResumeModal={() => setResumeModalOpen(true)} />
+      <Navbar
+        onOpenResumeModal={() => setResumeModalOpen(true)}
+        onOpenInquiriesModal={() => setInquiriesModalOpen(true)}
+      />
 
       {/* Main Content Sections */}
       <main className="flex-1 w-full">
@@ -37,7 +42,10 @@ export default function App() {
       </main>
 
       {/* Footer with Live System Health */}
-      <Footer onOpenGithubModal={() => setGithubModalOpen(true)} />
+      <Footer
+        onOpenGithubModal={() => setGithubModalOpen(true)}
+        onOpenInquiriesModal={() => setInquiriesModalOpen(true)}
+      />
 
       {/* Resume Download / Information Modal */}
       <Modal
@@ -153,6 +161,12 @@ export default function App() {
           </div>
         </div>
       </Modal>
+
+      {/* Inquiries Live Feed Admin Modal */}
+      <InquiriesModal
+        isOpen={inquiriesModalOpen}
+        onClose={() => setInquiriesModalOpen(false)}
+      />
     </div>
   );
 }

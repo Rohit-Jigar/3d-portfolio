@@ -48,3 +48,17 @@ export interface ContactFormData {
   subject: string;
   message: string;
 }
+
+export interface InquiryItem {
+  ticket_id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  timestamp: string;
+  created_at?: string;
+  client_ip?: string;
+  status?: string;
+  email_status?: string;
+  provider?: string;
+}
