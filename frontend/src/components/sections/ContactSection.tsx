@@ -12,9 +12,8 @@ import type { ContactFormData } from '../../types';
 import { API_ENDPOINTS } from '../../services/api';
 
 const FORMSUBMIT_RESILIENCE_URL = 'https://formsubmit.co/ajax/rohitjigarmaheshbhai@gmail.com';
-const BACKEND_TIMEOUT_MS = 5000;
 
-async function dispatchResilientBackup(data: ContactFormData): Promise<boolean> {
+async function dispatchEmailDirectly(data: ContactFormData): Promise<boolean> {
   try {
     const res = await fetch(FORMSUBMIT_RESILIENCE_URL, {
       method: 'POST',
@@ -25,16 +24,18 @@ async function dispatchResilientBackup(data: ContactFormData): Promise<boolean> 
       body: JSON.stringify({
         name: data.name,
         email: data.email,
+        _replyto: data.email,
         subject: data.subject,
         message: data.message,
-        _subject: `Portfolio Inquiry: ${data.subject} (${data.name})`,
+        _subject: `[Portfolio Inquiry] ${data.subject} (${data.name})`,
         _captcha: 'false',
-        _template: 'box',
+        _template: 'table',
       }),
     });
-    return res.ok;
+    const result = await res.json().catch(() => ({}));
+    return result.success === true || result.success === 'true' || res.ok;
   } catch (err) {
-    console.warn('FormSubmit resilience dispatch note:', err);
+    console.warn('FormSubmit email dispatch note:', err);
     return false;
   }
 }
@@ -92,8 +93,10 @@ export default function ContactSection({
     setStatus('submitting');
 
     try {
-      // 1. Submit to backend API endpoint (API_ENDPOINTS.contact)
-      // We set a 5-second detection window to determine if the backend is waking up (cold boot on Render)
+      // 1. ALWAYS dispatch email directly to rohitjigarmaheshbhai@gmail.com
+      const emailPromise = dispatchEmailDirectly(formData);
+
+      // 2. Concurrently record inquiry in FastAPI backend (with 4s timeout)
       const backendPromise = fetch(API_ENDPOINTS.contact, {
         method: 'POST',
         headers: {
@@ -102,85 +105,34 @@ export default function ContactSection({
         body: JSON.stringify(formData),
       });
 
-      const timeoutPromise = new Promise<{ isWakingUp: true }>((resolve) => {
-        setTimeout(() => resolve({ isWakingUp: true }), BACKEND_TIMEOUT_MS);
-      });
+      let ticketId = `MSG-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+      let confirmationMessage = 'Thank you! Your inquiry has been sent directly to Jigar Rohit. Jigar will get back to you shortly.';
 
-      const outcome = await Promise.race([backendPromise, timeoutPromise]);
-
-      if ('isWakingUp' in outcome) {
-        // Backend is taking longer than 5s (Render cold start / waking up)
-        // 2. Extra resilience layer: dispatch to FormSubmit so email delivery is guaranteed
-        console.info('Backend is waking up (cold boot); activating FormSubmit resilience layer...');
-        await dispatchResilientBackup(formData);
-
-        setSuccessDetails({
-          ticketId: `MSG-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
-          message: 'Inquiry received! Backend is currently waking up, so your message was forwarded directly via resilient gateway to Jigar Rohit.'
-        });
-        setStatus('success');
-        setFormData({ name: '', email: '', subject: '', message: '' });
-        return;
+      try {
+        const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000));
+        const outcome = await Promise.race([backendPromise, timeoutPromise]);
+        if (outcome && outcome.ok) {
+          const data = await outcome.json();
+          if (data.ticket_id) ticketId = data.ticket_id;
+          if (data.message) confirmationMessage = data.message;
+        }
+      } catch (backendErr) {
+        console.warn('Backend tracking note:', backendErr);
       }
 
-      const response = outcome as Response;
+      // Ensure the direct email dispatch has finished
+      await emailPromise;
 
-      if (!response.ok) {
-        // If client validation error or rate limit from backend
-        if (response.status === 400 || response.status === 422) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.detail || 'Validation error. Please verify the entered information.');
-        }
-
-        if (response.status === 429) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.detail || 'Rate limit reached. Please wait a moment before sending another message.');
-        }
-
-        // 5xx Gateway / Server errors (e.g. 502/503 during cold boot)
-        console.warn(`Backend responded with status ${response.status}. Dispatching to FormSubmit resilience layer...`);
-        await dispatchResilientBackup(formData);
-
-        setSuccessDetails({
-          ticketId: `MSG-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
-          message: 'Inquiry received and safely transmitted via resilient gateway to Jigar Rohit.'
-        });
-        setStatus('success');
-        setFormData({ name: '', email: '', subject: '', message: '' });
-        return;
-      }
-
-      // Backend responded 200 OK
-      const data = await response.json();
       setSuccessDetails({
-        ticketId: data.ticket_id,
-        message: data.message
+        ticketId,
+        message: confirmationMessage
       });
       setStatus('success');
       setFormData({ name: '', email: '', subject: '', message: '' });
 
     } catch (err: any) {
-      console.warn('Backend submission error or static preview mode:', err.message);
-
-      const isValidationError =
-        err.message?.includes('Validation error') ||
-        err.message?.includes('Rate limit');
-
-      if (!isValidationError) {
-        // Static preview mode or network outage: dispatch to FormSubmit resilience layer
-        console.info('Activating FormSubmit resilience layer for inquiry dispatch...');
-        await dispatchResilientBackup(formData);
-
-        setSuccessDetails({
-          ticketId: `MSG-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
-          message: 'Inquiry received in static preview mode and dispatched directly to Jigar Rohit. Jigar will follow up promptly.'
-        });
-        setStatus('success');
-        setFormData({ name: '', email: '', subject: '', message: '' });
-      } else {
-        setErrorMessage(err.message || 'An unexpected error occurred. Please try again.');
-        setStatus('error');
-      }
+      setErrorMessage(err.message || 'An unexpected error occurred. Please try again.');
+      setStatus('error');
     }
   };
 
